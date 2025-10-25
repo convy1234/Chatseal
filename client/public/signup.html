@@ -1,0 +1,379 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ChatSeal Sign Up</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+      padding: 20px;
+    }
+    
+    .container {
+      display: flex;
+      width: 900px;
+      max-width: 95%;
+      height: 600px;
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+    }
+    
+    .left-panel {
+      flex: 1;
+      background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+      color: white;
+      padding: 50px 40px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+    
+    .left-panel h1 {
+      font-size: 2.5rem;
+      margin-bottom: 15px;
+      font-weight: 700;
+    }
+    
+    .left-panel p {
+      font-size: 1.1rem;
+      opacity: 0.9;
+      line-height: 1.6;
+    }
+    
+    .right-panel {
+      flex: 1;
+      background: #fff;
+      padding: 40px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      overflow-y: auto;
+    }
+    
+    .logo {
+      text-align: center;
+      margin-bottom: 25px;
+    }
+    
+    .logo h2 {
+      font-size: 1.8rem;
+      color: #333;
+      font-weight: 700;
+    }
+    
+    .logo p {
+      color: #666;
+      margin-top: 5px;
+    }
+    
+    .social-buttons {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+    
+    .social-btn {
+      flex: 1;
+      padding: 12px;
+      border: none;
+      border-radius: 8px;
+      font-size: 14px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: all 0.3s ease;
+    }
+    
+    .fb-btn {
+      background-color: #1877f2;
+      color: white;
+    }
+    
+    .google-btn {
+      background-color: #fff;
+      border: 1px solid #ddd;
+      color: #444;
+    }
+    
+    .social-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    }
+    
+    .divider {
+      text-align: center;
+      margin: 15px 0;
+      position: relative;
+      color: #777;
+      font-size: 14px;
+    }
+    
+    .divider::before {
+      content: "";
+      position: absolute;
+      top: 50%;
+      left: 0;
+      right: 0;
+      height: 1px;
+      background: #ddd;
+      z-index: 1;
+    }
+    
+    .divider span {
+      background: #fff;
+      padding: 0 15px;
+      position: relative;
+      z-index: 2;
+    }
+    
+    .form-row {
+      display: flex;
+      gap: 15px;
+      margin-bottom: 15px;
+    }
+    
+    .form-group {
+      margin-bottom: 15px;
+      position: relative;
+      flex: 1;
+    }
+    
+    .form-group i {
+      position: absolute;
+      left: 15px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #777;
+    }
+    
+    input {
+      width: 100%;
+      padding: 14px 14px 14px 45px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      font-size: 15px;
+      transition: all 0.3s;
+    }
+    
+    input:focus {
+      outline: none;
+      border-color: #6a11cb;
+      box-shadow: 0 0 0 3px rgba(106, 17, 203, 0.1);
+    }
+    
+    .terms {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      margin: 15px 0;
+      font-size: 14px;
+      color: #666;
+    }
+    
+    .terms input {
+      width: auto;
+      margin-top: 3px;
+    }
+    
+    .terms a {
+      color: #6a11cb;
+      text-decoration: none;
+    }
+    
+    .terms a:hover {
+      text-decoration: underline;
+    }
+    
+    .signup-btn {
+      width: 100%;
+      padding: 14px;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+      color: white;
+      transition: all 0.3s ease;
+      margin-top: 10px;
+    }
+    
+    .signup-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 7px 15px rgba(106, 17, 203, 0.3);
+    }
+    
+    .login-link {
+      text-align: center;
+      margin-top: 20px;
+      font-size: 14px;
+      color: #666;
+    }
+    
+    .login-link a {
+      color: #6a11cb;
+      text-decoration: none;
+      font-weight: 600;
+    }
+    
+    .login-link a:hover {
+      text-decoration: underline;
+    }
+    
+    @media (max-width: 768px) {
+      .container {
+        flex-direction: column;
+        height: auto;
+      }
+      
+      .left-panel {
+        padding: 30px 25px;
+      }
+      
+      .right-panel {
+        padding: 30px 25px;
+      }
+      
+      .social-buttons {
+        flex-direction: column;
+      }
+      
+      .form-row {
+        flex-direction: column;
+        gap: 0;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="left-panel">
+      <h1>Join ChatSeal</h1>
+      <p>Create your account and start connecting with customers in real-time. Provide exceptional support and build lasting relationships with our secure messaging platform.</p>
+    </div>
+    
+    <div class="right-panel">
+      <div class="logo">
+        <h2>ChatSeal</h2>
+        <p>Create your account</p>
+      </div>
+      
+      <div class="social-buttons">
+        <button id="facebookSignup" class="social-btn fb-btn">
+          <i class="fab fa-facebook-f"></i>
+          Facebook
+        </button>
+        <button id="googleSignup" class="social-btn google-btn">
+          <i class="fab fa-google"></i>
+          Google
+        </button>
+      </div>
+      
+      <div class="divider">
+        <span>or sign up with email</span>
+      </div>
+      
+      <form id="signupForm">
+        <div class="form-row">
+          <div class="form-group">
+            <i class="fas fa-user"></i>
+            <input id="firstName" type="text" placeholder="First Name" required>
+          </div>
+          <div class="form-group">
+            <i class="fas fa-user"></i>
+            <input id="lastName" type="text" placeholder="Last Name" required>
+          </div>
+        </div>
+        
+        <div class="form-group">
+          <i class="fas fa-envelope"></i>
+          <input id="email" type="email" placeholder="Email address" required>
+        </div>
+        
+        <div class="form-group">
+          <i class="fas fa-lock"></i>
+          <input id="password" type="password" placeholder="Password" required>
+        </div>
+        
+        <div class="form-group">
+          <i class="fas fa-lock"></i>
+          <input id="confirmPassword" type="password" placeholder="Confirm Password" required>
+        </div>
+        
+        <div class="terms">
+          <input type="checkbox" id="agreeTerms" required>
+          <label for="agreeTerms">I agree to the <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a></label>
+        </div>
+        
+        <button type="submit" class="signup-btn">Create Account</button>
+      </form>
+      
+      <div class="login-link">
+        Already have an account? <a href="index.html">Sign in</a>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const BASE_URL = window.location.origin;
+
+    document.getElementById("facebookSignup").onclick = () => {
+      window.location.href = `${BASE_URL}/api/auth/facebook/start`;
+    };
+
+    document.getElementById("googleSignup").onclick = () => {
+      window.location.href = `${BASE_URL}/api/auth/google/start`;
+    };
+
+    document.getElementById("signupForm").onsubmit = (e) => {
+      e.preventDefault();
+      
+      const firstName = document.getElementById("firstName").value;
+      const lastName = document.getElementById("lastName").value;
+      const email = document.getElementById("email").value;
+      const password = document.getElementById("password").value;
+      const confirmPassword = document.getElementById("confirmPassword").value;
+      const agreeTerms = document.getElementById("agreeTerms").checked;
+      
+      // Basic validation
+      if (!firstName || !lastName || !email || !password || !confirmPassword) {
+        alert("Please fill in all fields");
+        return;
+      }
+      
+      if (password !== confirmPassword) {
+        alert("Passwords do not match");
+        return;
+      }
+      
+      if (!agreeTerms) {
+        alert("You must agree to the Terms of Service and Privacy Policy");
+        return;
+      }
+      
+      // In a real application, you would send this to your backend for registration
+      // For demo purposes, we'll simulate a successful signup and redirect
+      console.log("Signup attempt with:", firstName, lastName, email, password);
+      
+      // Redirect to dashboard after successful signup
+      window.location.href = "dashboard.html";
+    };
+  </script>
+</body>
+</html>

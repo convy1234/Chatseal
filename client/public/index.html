@@ -1,0 +1,331 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ChatSeal Login</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      background: linear-gradient(135deg, #eef2f3 0%, #8e9eab 100%);
+      padding: 20px;
+    }
+
+    .container {
+      display: flex;
+      width: 900px;
+      max-width: 95%;
+      min-height: 550px;
+      border-radius: 16px;
+      overflow: hidden;
+      background: #fff;
+      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+    }
+
+    .left-panel {
+      flex: 1;
+      background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+      color: white;
+      padding: 50px 40px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .left-panel h1 {
+      font-size: 2.6rem;
+      margin-bottom: 15px;
+      font-weight: 700;
+    }
+
+    .left-panel p {
+      font-size: 1.1rem;
+      opacity: 0.9;
+      line-height: 1.6;
+    }
+
+    .right-panel {
+      flex: 1;
+      padding: 50px 40px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .logo {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+
+    .logo h2 {
+      font-size: 1.9rem;
+      color: #333;
+      font-weight: 700;
+    }
+
+    .logo p {
+      color: #666;
+      margin-top: 5px;
+    }
+
+    .social-buttons {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 25px;
+    }
+
+    .social-btn {
+      flex: 1;
+      padding: 12px;
+      border: none;
+      border-radius: 8px;
+      font-size: 14px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: all 0.3s ease;
+    }
+
+    .fb-btn {
+      background-color: #1877f2;
+      color: white;
+    }
+
+    .google-btn {
+      background-color: #fff;
+      border: 1px solid #ddd;
+      color: #444;
+    }
+
+    .social-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    }
+
+    .divider {
+      text-align: center;
+      margin: 20px 0;
+      position: relative;
+      color: #777;
+      font-size: 14px;
+    }
+
+    .divider::before {
+      content: "";
+      position: absolute;
+      top: 50%;
+      left: 0;
+      right: 0;
+      height: 1px;
+      background: #ddd;
+      z-index: 1;
+    }
+
+    .divider span {
+      background: #fff;
+      padding: 0 15px;
+      position: relative;
+      z-index: 2;
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+      position: relative;
+    }
+
+    .form-group i {
+      position: absolute;
+      left: 15px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #777;
+    }
+
+    input {
+      width: 100%;
+      padding: 14px 14px 14px 45px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      font-size: 15px;
+      transition: all 0.3s;
+    }
+
+    input:focus {
+      outline: none;
+      border-color: #6a11cb;
+      box-shadow: 0 0 0 3px rgba(106, 17, 203, 0.1);
+    }
+
+    .login-btn {
+      width: 100%;
+      padding: 14px;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+      color: white;
+      transition: all 0.3s ease;
+      margin-top: 10px;
+    }
+
+    .login-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 7px 15px rgba(106, 17, 203, 0.3);
+    }
+
+    .forgot-password,
+    .signup-link {
+      text-align: center;
+      margin-top: 20px;
+      font-size: 14px;
+      color: #666;
+    }
+
+    .forgot-password a,
+    .signup-link a {
+      color: #6a11cb;
+      text-decoration: none;
+      font-weight: 600;
+    }
+
+    .forgot-password a:hover,
+    .signup-link a:hover {
+      text-decoration: underline;
+    }
+
+    #loading {
+      display: none;
+      text-align: center;
+      margin-top: 15px;
+      color: #6a11cb;
+      font-weight: 500;
+    }
+
+    @media (max-width: 768px) {
+      .container {
+        flex-direction: column;
+        height: auto;
+      }
+
+      .social-buttons {
+        flex-direction: column;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="left-panel">
+      <h1>Welcome to ChatSeal</h1>
+      <p>Connect with your customers in real-time. Provide exceptional support and build lasting relationships with our secure messaging platform.</p>
+    </div>
+
+    <div class="right-panel">
+      <div class="logo">
+        <h2>ChatSeal</h2>
+        <p>Sign in to your account</p>
+      </div>
+
+      <div class="social-buttons">
+        <button id="facebookLogin" class="social-btn fb-btn">
+          <i class="fab fa-facebook-f"></i>
+          Continue with Facebook
+        </button>
+        <button id="googleLogin" class="social-btn google-btn">
+          <i class="fab fa-google"></i>
+          Continue with Google
+        </button>
+      </div>
+
+      <div class="divider">
+        <span>or continue with email</span>
+      </div>
+
+      <div class="form-group">
+        <i class="fas fa-envelope"></i>
+        <input id="email" type="email" placeholder="Email address">
+      </div>
+
+      <div class="form-group">
+        <i class="fas fa-lock"></i>
+        <input id="password" type="password" placeholder="Password">
+      </div>
+
+      <button id="loginBtn" class="login-btn">Sign in</button>
+
+      <p id="loading"><i class="fas fa-spinner fa-spin"></i> Signing you in...</p>
+
+      <div class="forgot-password">
+        <a href="#">Forgot your password?</a>
+      </div>
+
+      <div class="signup-link">
+        Don't have an account? <a href="signup.html">Sign up</a>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const BASE_URL = window.location.origin;
+
+    // Handle Facebook Login
+    document.getElementById("facebookLogin").onclick = () => {
+      window.location.href = `${BASE_URL}/api/auth/facebook`;
+    };
+
+    // Handle Google Login
+    document.getElementById("googleLogin").onclick = () => {
+      window.location.href = `${BASE_URL}/api/auth/google`;
+    };
+
+    // Handle Manual Login
+    document.getElementById("loginBtn").onclick = async () => {
+      const email = document.getElementById("email").value.trim();
+      const password = document.getElementById("password").value.trim();
+      const loading = document.getElementById("loading");
+
+      if (!email || !password) {
+        alert("Please enter both email and password");
+        return;
+      }
+
+      loading.style.display = "block";
+
+      try {
+        const response = await fetch(`${BASE_URL}/api/auth/login`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email, password })
+        });
+
+        const data = await response.json();
+        loading.style.display = "none";
+
+        if (response.ok) {
+          window.location.href = "/dashboard.html";
+        } else {
+          alert(data.message || "Login failed");
+        }
+      } catch (err) {
+        loading.style.display = "none";
+        alert("Unable to connect to server. Please try again.");
+      }
+    };
+  </script>
+</body>
+</html>

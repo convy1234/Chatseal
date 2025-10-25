@@ -1,0 +1,2244 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ChatSeal Dashboard</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+      display: flex;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    /* Sidebar */
+    .sidebar {
+      width: 260px;
+      background: linear-gradient(180deg, #1a237e 0%, #303f9f 50%, #3949ab 100%);
+      color: white;
+      display: flex;
+      flex-direction: column;
+      padding: 25px 0;
+      box-shadow: 2px 0 15px rgba(0,0,0,0.1);
+    }
+
+    .sidebar h2 {
+      text-align: center;
+      font-size: 1.6rem;
+      margin-bottom: 40px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+    }
+
+    .nav-item {
+      padding: 15px 25px;
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      margin: 5px 15px;
+      border-radius: 12px;
+      font-weight: 500;
+    }
+
+    .nav-item:hover {
+      background: rgba(255, 255, 255, 0.15);
+      transform: translateX(5px);
+    }
+
+    .nav-item.active {
+      background: rgba(255, 255, 255, 0.2);
+      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+      border-left: 4px solid #4fc3f7;
+    }
+
+    .nav-item span {
+      font-size: 0.95rem;
+    }
+
+    /* Main content */
+    .main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      background: #f8fafc;
+    }
+
+    /* Topbar */
+    .topbar {
+      height: 70px;
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(10px);
+      box-shadow: 0 2px 20px rgba(0, 0, 0, 0.08);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 30px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .topbar h1 {
+      font-size: 1.4rem;
+      color: #2d3748;
+      font-weight: 600;
+    }
+
+    .profile {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      padding: 8px 15px;
+      border-radius: 25px;
+      background: rgba(79, 195, 247, 0.1);
+      transition: all 0.3s ease;
+    }
+
+    .profile:hover {
+      background: rgba(79, 195, 247, 0.2);
+    }
+
+    .profile img {
+      border-radius: 50%;
+      width: 45px;
+      height: 45px;
+      border: 3px solid #4fc3f7;
+    }
+
+    .profile span {
+      font-weight: 600;
+      color: #2d3748;
+    }
+
+    /* Dashboard content */
+    .content {
+      flex: 1;
+      padding: 30px;
+      overflow-y: auto;
+      transition: opacity 0.3s ease;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    /* Enhanced Card Styles */
+    .card {
+      background: white;
+      border-radius: 16px;
+      box-shadow: 0 8px 30px rgba(0,0,0,0.08);
+      padding: 30px;
+      margin: auto;
+      text-align: center;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      transition: all 0.3s ease;
+    }
+
+    .card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 15px 40px rgba(0,0,0,0.12);
+    }
+
+    .card img {
+      border-radius: 50%;
+      width: 100px;
+      height: 100px;
+      margin-bottom: 20px;
+      border: 4px solid #4fc3f7;
+      box-shadow: 0 4px 15px rgba(79, 195, 247, 0.3);
+    }
+
+    /* Dashboard Grid */
+    .dashboard-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 25px;
+      margin-bottom: 30px;
+    }
+
+    .stat-card {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 25px;
+      border-radius: 16px;
+      text-align: center;
+      box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+      transition: all 0.3s ease;
+    }
+
+    .stat-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 12px 35px rgba(102, 126, 234, 0.4);
+    }
+
+    .stat-card.facebook {
+      background: linear-gradient(135deg, #1877f2 0%, #0e4aa7 100%);
+    }
+
+    .stat-card.instagram {
+      background: linear-gradient(135deg, #405DE6 0%, #5851DB 50%, #833AB4 100%);
+    }
+
+    .stat-card.whatsapp {
+      background: linear-gradient(135deg, #25D366 0%, #128C7E 100%);
+    }
+
+    .stat-number {
+      font-size: 2.5rem;
+      font-weight: 700;
+      margin-bottom: 5px;
+    }
+
+    .stat-label {
+      font-size: 0.9rem;
+      opacity: 0.9;
+      font-weight: 500;
+    }
+
+    .stat-change {
+      font-size: 0.8rem;
+      margin-top: 8px;
+      padding: 3px 8px;
+      border-radius: 12px;
+      background: rgba(255,255,255,0.2);
+      display: inline-block;
+    }
+
+    /* Quick Actions */
+    .quick-actions {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 20px;
+      margin-bottom: 30px;
+    }
+
+    .action-card {
+      background: white;
+      padding: 25px;
+      border-radius: 16px;
+      text-align: center;
+      box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+      transition: all 0.3s ease;
+      cursor: pointer;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .action-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+    }
+
+    .action-icon {
+      font-size: 2.5rem;
+      margin-bottom: 15px;
+    }
+
+    .action-title {
+      font-weight: 600;
+      color: #2d3748;
+      margin-bottom: 8px;
+    }
+
+    .action-desc {
+      font-size: 0.85rem;
+      color: #718096;
+    }
+
+    /* Recent Activity */
+    .activity-list {
+      background: white;
+      border-radius: 16px;
+      padding: 25px;
+      box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+    }
+
+    .activity-item {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      padding: 15px 0;
+      border-bottom: 1px solid #f1f1f1;
+    }
+
+    .activity-item:last-child {
+      border-bottom: none;
+    }
+
+    .activity-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.2rem;
+    }
+
+    .activity-content {
+      flex: 1;
+    }
+
+    .activity-title {
+      font-weight: 600;
+      color: #2d3748;
+    }
+
+    .activity-time {
+      font-size: 0.8rem;
+      color: #718096;
+    }
+
+    /* Sections */
+    section {
+      animation: fadeIn 0.4s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Button Styles */
+    .btn-primary {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border: none;
+      padding: 14px 28px;
+      border-radius: 10px;
+      font-size: 16px;
+      cursor: pointer;
+      margin: 5px;
+      font-weight: 600;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+    }
+
+    .btn-secondary {
+      background: #6c757d;
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 10px;
+      font-size: 16px;
+      cursor: pointer;
+      margin: 5px;
+      transition: all 0.3s ease;
+    }
+
+    .btn-secondary:hover {
+      background: #5a6268;
+      transform: translateY(-1px);
+    }
+
+    /* Tab Styles */
+    .tab-btn {
+      padding: 12px 20px;
+      border: none;
+      background: #f8f9fa;
+      cursor: pointer;
+      border-radius: 10px 10px 0 0;
+      font-weight: 500;
+      transition: all 0.3s ease;
+    }
+
+    .tab-btn.active {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+    }
+
+    .tab-btn:hover:not(.active) {
+      background: #e9ecef;
+    }
+
+    /* Instagram/Facebook Post Styles */
+    .ig-post {
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      padding: 20px;
+      margin: 15px 0;
+      background: white;
+      transition: all 0.3s ease;
+    }
+
+    .ig-post:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+      border-color: #cbd5e0;
+    }
+
+    .ig-message {
+      margin: 10px 0;
+      padding: 12px 16px;
+      border-radius: 20px;
+      max-width: 70%;
+      word-wrap: break-word;
+    }
+
+    .ig-message.incoming {
+      background: #f7fafc;
+      border: 1px solid #e2e8f0;
+      align-self: flex-start;
+    }
+
+    .ig-message.outgoing {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      align-self: flex-end;
+      margin-left: auto;
+    }
+
+    .conversation-item {
+      padding: 15px;
+      border: 1px solid #e2e8f0;
+      margin: 8px 0;
+      border-radius: 12px;
+      cursor: pointer;
+      background: #f8fafc;
+      transition: all 0.3s ease;
+    }
+
+    .conversation-item:hover {
+      background: #edf2f7;
+      transform: translateX(3px);
+    }
+
+    .conversation-item.active {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border-color: #667eea;
+    }
+
+    .message {
+      margin: 10px 0;
+      padding: 12px 16px;
+      border-radius: 15px;
+      max-width: 80%;
+      word-wrap: break-word;
+    }
+
+    .message.incoming {
+      background: #f7fafc;
+      border: 1px solid #e2e8f0;
+      align-self: flex-start;
+    }
+
+    .message.outgoing {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      align-self: flex-end;
+      margin-left: auto;
+    }
+
+    /* Facebook Tab Styles */
+    .facebook-tab {
+      display: none;
+    }
+
+    .facebook-tab.active {
+      display: block;
+    }
+
+    .instagram-tab {
+      display: none;
+    }
+
+    .instagram-tab.active {
+      display: block;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 1024px) {
+      .dashboard-grid {
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      }
+      
+      .quick-actions {
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      }
+    }
+
+    @media (max-width: 768px) {
+      .sidebar {
+        width: 80px;
+      }
+      
+      .sidebar h2, .nav-item span {
+        display: none;
+      }
+      
+      .nav-item {
+        justify-content: center;
+        padding: 15px;
+      }
+      
+      .dashboard-grid {
+        grid-template-columns: 1fr;
+      }
+      
+      .quick-actions {
+        grid-template-columns: 1fr;
+      }
+      
+      .content {
+        padding: 20px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .topbar {
+        padding: 0 15px;
+      }
+      
+      .profile span {
+        display: none;
+      }
+      
+      .card {
+        padding: 20px;
+      }
+    }
+
+    /* Scrollbar Styling */
+    ::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: #f1f1f1;
+      border-radius: 10px;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      border-radius: 10px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: linear-gradient(135deg, #5a6fd8 0%, #6a42a8 100%);
+    }
+  </style>
+</head>
+<body>
+
+  <aside class="sidebar">
+    <h2>ChatSeal</h2>
+    <div class="nav-item active" data-section="dashboard"><span>🏠 Dashboard</span></div>
+    <div class="nav-item" data-section="facebook"><span>📘 Facebook</span></div>
+    <div class="nav-item" data-section="instagram"><span>📸 Instagram</span></div>
+    <div class="nav-item" data-section="whatsapp"><span>📱 WhatsApp</span></div>
+    <div class="nav-item" data-section="customers"><span>👥 Customers</span></div>
+    <div class="nav-item" data-section="settings"><span>⚙️ Settings</span></div>
+  </aside>
+
+  <div class="main">
+    <div class="topbar">
+      <h1 id="sectionTitle">Dashboard Overview</h1>
+      <div class="profile">
+        <img id="topbarPic" src="" alt="Profile" />
+        <span id="topbarName"></span>
+      </div>
+    </div>
+
+    <div class="content">
+      <!-- Enhanced Dashboard Section -->
+      <section id="dashboardSection">
+        <!-- Welcome Card -->
+        <div class="card" style="max-width: 600px; margin-bottom: 30px;">
+          <img id="profilePic" src="" alt="Profile Picture" />
+          <h2 id="userName" style="margin-bottom: 10px;"></h2>
+          <p style="color: #718096; font-size: 1.1rem; margin-bottom: 20px;">Welcome to your ChatSeal Dashboard!</p>
+          <div id="pageInfo" style="margin-top: 20px;"></div>
+        </div>
+
+        <!-- Statistics Grid -->
+        <div class="dashboard-grid">
+          <div class="stat-card facebook">
+            <div class="stat-number">1,247</div>
+            <div class="stat-label">Facebook Followers</div>
+            <div class="stat-change">+12% this week</div>
+          </div>
+          
+          <div class="stat-card instagram">
+            <div class="stat-number">3,891</div>
+            <div class="stat-label">Instagram Followers</div>
+            <div class="stat-change">+8% this week</div>
+          </div>
+          
+          <div class="stat-card whatsapp">
+            <div class="stat-number">156</div>
+            <div class="stat-label">WhatsApp Conversations</div>
+            <div class="stat-change">+23% this week</div>
+          </div>
+          
+          <div class="stat-card">
+            <div class="stat-number">94%</div>
+            <div class="stat-label">Response Rate</div>
+            <div class="stat-change">+5% this week</div>
+          </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <h3 style="margin: 30px 0 20px 0; color: #2d3748;">Quick Actions</h3>
+        <div class="quick-actions">
+          <div class="action-card" onclick="showSection('facebook')">
+            <div class="action-icon">💬</div>
+            <div class="action-title">Reply to Messages</div>
+            <div class="action-desc">Respond to pending customer messages</div>
+          </div>
+          
+          <div class="action-card" onclick="showSection('instagram')">
+            <div class="action-icon">📱</div>
+            <div class="action-title">Create Post</div>
+            <div class="action-desc">Share new content on Instagram</div>
+          </div>
+          
+          <div class="action-card" onclick="showSection('customers')">
+            <div class="action-icon">👥</div>
+            <div class="action-title">View Customers</div>
+            <div class="action-desc">Manage your customer database</div>
+          </div>
+          
+          <div class="action-card" onclick="showSection('settings')">
+            <div class="action-icon">📊</div>
+            <div class="action-title">View Analytics</div>
+            <div class="action-desc">Check performance insights</div>
+          </div>
+        </div>
+
+        <!-- Recent Activity -->
+        <div class="activity-list">
+          <h3 style="margin-bottom: 20px; color: #2d3748;">Recent Activity</h3>
+          <div class="activity-item">
+            <div class="activity-icon" style="background: rgba(79, 195, 247, 0.1); color: #4fc3f7;">💬</div>
+            <div class="activity-content">
+              <div class="activity-title">New message from Sarah Johnson</div>
+              <div class="activity-time">2 minutes ago</div>
+            </div>
+          </div>
+          <div class="activity-item">
+            <div class="activity-icon" style="background: rgba(102, 126, 234, 0.1); color: #667eea;">❤️</div>
+            <div class="activity-content">
+              <div class="activity-title">Your post got 24 new likes</div>
+              <div class="activity-time">1 hour ago</div>
+            </div>
+          </div>
+          <div class="activity-item">
+            <div class="activity-icon" style="background: rgba(37, 211, 102, 0.1); color: #25D366;">📱</div>
+            <div class="activity-content">
+              <div class="activity-title">New WhatsApp business message</div>
+              <div class="activity-time">3 hours ago</div>
+            </div>
+          </div>
+          <div class="activity-item">
+            <div class="activity-icon" style="background: rgba(245, 158, 11, 0.1); color: #f59e0b;">👥</div>
+            <div class="activity-content">
+              <div class="activity-title">5 new followers this week</div>
+              <div class="activity-time">1 day ago</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Your existing Facebook Section -->
+<section id="facebookSection">
+  <div class="card" style="max-width:900px;text-align:left; padding:16px;">
+    <div id="facebookModeBanner" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+      <div>
+        <h2 style="margin:0">Facebook Manager</h2>
+        <p style="color:#666;margin:4px 0 0 0;">Manage your Facebook Page messages, posts, and comments</p>
+      </div>
+      <div style="text-align:right;">
+        <div id="modeBadge" style="padding:6px 10px;border-radius:8px;background:#ffefc2;color:#7a5b00;font-weight:600;">Demo Mode</div>
+        <div style="font-size:12px;color:#999;margin-top:4px;">Not yet approved? Use demo data for review.</div>
+
+        <!-- NEW: Connect button & simulate live toggle -->
+        <div style="margin-top:8px; display:flex; gap:8px; justify-content:flex-end; align-items:center;">
+          <button id="connectFacebookBtn" onclick="connectFacebookPage()" class="btn-primary" style="padding:8px 12px;">Connect Facebook Page</button>
+          <button id="simulateLiveBtn" onclick="toggleSimulateLive()" class="btn-secondary" style="padding:8px 12px;">Simulate Live</button>
+        </div>
+      </div>
+    </div>
+
+    <div style="display:flex; gap: 10px; margin-bottom: 12px; border-bottom: 1px solid #ddd;">
+      <button class="tab-btn active" onclick="showFacebookTab('messenger', event)">💬 Messenger</button>
+      <button class="tab-btn" onclick="showFacebookTab('posts', event)">📝 Posts</button>
+      <button class="tab-btn" onclick="showFacebookTab('comments', event)">💭 Comments</button>
+      <button class="tab-btn" onclick="showFacebookTab('create', event)">➕ Create Post</button>
+      <button class="tab-btn" onclick="showFacebookTab('review', event)">📋 Review Flow</button>
+    </div>
+
+    <!-- Messenger Tab -->
+    <div id="facebookMessenger" class="facebook-tab active">
+      <h3>Messenger Inbox</h3>
+      <div style="display:flex; gap:15px; margin-top:15px;">
+        <div id="conversations" style="width:240px; max-height:420px; overflow-y:auto; border:1px solid #ddd; border-radius:8px; padding:10px; background:#fafafa;">
+          Loading conversations...
+        </div>
+
+        <div style="flex:1; display:flex; flex-direction:column; max-height:420px;">
+          <div id="messages" style="flex:1; overflow-y:auto; border:1px solid #ddd; border-radius:8px; padding:10px; background:#fff;">
+            Select a conversation to view messages
+          </div>
+          <div style="margin-top:10px; display:flex; gap:10px;">
+            <input id="replyInput" type="text" placeholder="Type a reply..." style="flex:1;padding:10px;border:1px solid #ccc;border-radius:6px;">
+            <button id="sendReply" class="btn-primary" style="padding:10px 16px;">Send Reply</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Posts Tab -->
+    <div id="facebookPosts" class="facebook-tab" style="display:none;">
+      <h3>Your Facebook Posts</h3>
+      <button onclick="loadFacebookPosts()" class="btn-primary">Load Posts</button>
+      <div id="facebookPostsList" style="margin-top: 15px; max-height: 420px; overflow-y: auto;"></div>
+    </div>
+
+    <!-- Comments Tab -->
+    <div id="facebookComments" class="facebook-tab" style="display:none;">
+      <h3>Recent Comments</h3>
+      <button onclick="loadFacebookComments()" class="btn-primary">Load Comments</button>
+      <div id="facebookCommentsList" style="margin-top: 15px; max-height: 420px; overflow-y: auto;"></div>
+    </div>
+
+    <!-- Create Post Tab -->
+    <div id="facebookCreate" class="facebook-tab" style="display:none;">
+      <h3>Create New Post</h3>
+      <div style="display: flex; flex-direction: column; gap: 10px;">
+        <textarea id="postMessage" placeholder="What's on your mind?" style="width: 100%; height: 100px; padding: 10px; border: 1px solid #ccc; border-radius: 6px; resize: vertical;"></textarea>
+        <div style="display: flex; gap: 10px;">
+          <button onclick="createFacebookPost()" class="btn-primary">Publish Post</button>
+          <button onclick="clearPostForm()" class="btn-secondary">Clear</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Review Flow Tab -->
+    <div id="facebookReview" class="facebook-tab" style="display:none;">
+      <h3>Facebook App Review Flow (Demo)</h3>
+      <p style="color:#666">Use this flow in your screencast to show reviewers how your app authenticates, requests permissions, and uses the Page / Messenger APIs.</p>
+
+      <div style="display:flex; gap:12px; margin-top:12px;">
+        <div style="flex:1; border:1px solid #eee; padding:12px; border-radius:8px; background:#fafafa;">
+          <h4>Checklist for Screencast</h4>
+          <ol>
+            <li>Show app UI and where users click to connect a Facebook Page.</li>
+            <li>Click <strong>Start Demo OAuth</strong> to show the permission prompt (simulated).</li>
+            <li>Show the reviewer how <em>pages_messaging</em> and <em>pages_manage_posts</em> are used in UI.</li>
+            <li>Show sending a reply to a comment and creating a post (demo).</li>
+          </ol>
+          <button onclick="startDemoOAuth()" class="btn-primary" style="margin-top:10px;">Start Demo OAuth</button>
+          <!-- <button onclick="simulateGrantPermissions()" class="btn-secondary" style="margin-top:10px;">Simulate Granting Permissions</button> -->
+        </div>
+
+        <!-- <div style="flex:1; border:1px solid #eee; padding:12px; border-radius:8px;">
+          <h4>Live vs Demo</h4>
+          <p style="font-size:13px;color:#555;">This project auto-detects live mode by checking the backend <code>/api/facebook/status</code>. If live credentials are missing, it uses demo endpoints:</p>
+          <ul>
+            <li><code>/api/facebook/posts</code> → live or <code>/api/facebook/mock/posts</code></li>
+            <li><code>/api/facebook/comments</code> → live or <code>/api/facebook/mock/comments</code></li>
+            <li><code>/api/facebook/conversations</code> → live or <code>/api/facebook/mock/conversations</code></li>
+          </ul>
+          <p style="font-size:13px;color:#999;margin-top:6px;">Tip: During your Facebook review screencast, show both the UI actions and the console/server logs.</p>
+        </div> -->
+      </div>
+    </div>
+  </div>
+</section>
+
+
+      <!-- Your existing Instagram Section -->
+      <section id="instagramSection" class="hidden">
+        <div class="card" style="max-width: 800px; text-align: left;">
+          <h2>Instagram Manager</h2>
+          
+          <!-- Auth Prompt -->
+          <div id="instagramAuthPrompt" style="text-align: center; padding: 20px;">
+            <p>Connect your Instagram Business Account to manage content</p>
+            <button onclick="connectInstagram()" class="btn-primary" style="margin: 10px;">
+              Connect Instagram Account
+            </button>
+          </div>
+
+          <!-- Instagram Content -->
+          <div id="instagramContent" style="display: none;">
+            <div style="display: flex; gap: 10px; margin-bottom: 20px; border-bottom: 1px solid #ddd; flex-wrap: wrap;">
+              <button class="tab-btn active" onclick="showInstagramTab('posts')">📱 Posts</button>
+              <button class="tab-btn" onclick="showInstagramTab('create')">✨ Create Post</button>
+              <button class="tab-btn" onclick="showInstagramTab('stories')">🎬 Stories</button>
+              <button class="tab-btn" onclick="showInstagramTab('create-story')">➕ Create Story</button>
+              <button class="tab-btn" onclick="showInstagramTab('insights')">📊 Insights</button>
+              <button class="tab-btn" onclick="showInstagramTab('messages')">🔒 Messages</button>
+              <button class="tab-btn" onclick="showInstagramTab('profile')">👤 Profile</button>
+            </div>
+
+            <!-- Posts Tab -->
+            <div id="instagramPosts" class="instagram-tab active">
+              <h3>Your Instagram Posts</h3>
+              <button onclick="loadInstagramPosts()" class="btn-primary">Refresh Posts</button>
+              <div id="postsList" style="margin-top: 15px;"></div>
+            </div>
+
+            <!-- Create Post Tab -->
+            <div id="instagramCreate" class="instagram-tab">
+              <h3>Create New Post</h3>
+              <div style="max-width: 500px;">
+                <div style="margin-bottom: 15px;">
+                  <label>Caption:</label>
+                  <textarea id="postCaption" placeholder="What's on your mind?" style="width: 100%; height: 100px; padding: 10px; border: 1px solid #ccc; border-radius: 6px;"></textarea>
+                </div>
+                <div style="margin-bottom: 15px;">
+                  <label>Image URL (optional):</label>
+                  <input id="postImageUrl" type="text" placeholder="https://example.com/image.jpg" style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px;">
+                </div>
+                <button onclick="createInstagramPost()" class="btn-primary">Create Post</button>
+              </div>
+            </div>
+
+            <!-- Stories Tab -->
+            <div id="instagramStories" class="instagram-tab">
+              <h3>Your Active Stories</h3>
+              <button onclick="loadInstagramStories()" class="btn-primary">Refresh Stories</button>
+              <div id="storiesList" style="margin-top: 15px;"></div>
+            </div>
+
+            <!-- Create Story Tab -->
+            <div id="instagramCreateStory" class="instagram-tab">
+              <h3>Create New Story</h3>
+              <div style="max-width: 500px;">
+                <div style="margin-bottom: 15px;">
+                  <label>Image URL:</label>
+                  <input id="storyImageUrl" type="text" placeholder="https://example.com/story-image.jpg" style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px;">
+                  <small style="color: #666;">Provide either Image URL OR Video URL</small>
+                </div>
+                
+                <div style="margin-bottom: 15px;">
+                  <label>Video URL:</label>
+                  <input id="storyVideoUrl" type="text" placeholder="https://example.com/story-video.mp4" style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px;">
+                </div>
+                
+                <div style="margin-bottom: 15px;">
+                  <label>Caption (optional):</label>
+                  <textarea id="storyCaption" placeholder="Add a caption to your story..." style="width: 100%; height: 80px; padding: 10px; border: 1px solid #ccc; border-radius: 6px;"></textarea>
+                </div>
+                
+                <div style="margin-bottom: 15px;">
+                  <label>Mention @username (optional):</label>
+                  <input id="storyMention" type="text" placeholder="username" style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px;">
+                </div>
+                
+                <button onclick="createInstagramStory()" class="btn-primary">Create Story</button>
+              </div>
+            </div>
+
+            <!-- Comments Tab -->
+            <div id="instagramComments" class="instagram-tab">
+              <h3>Recent Comments</h3>
+              <button onclick="loadInstagramComments()" class="btn-primary">Load Comments</button>
+              <div id="commentsList" style="margin-top: 15px;"></div>
+            </div>
+
+            <!-- Insights Tab -->
+            <div id="instagramInsights" class="instagram-tab">
+              <h3>Account Insights</h3>
+              <button onclick="loadInstagramInsights()" class="btn-primary">Load Insights</button>
+              <div id="insightsList" style="margin-top: 15px;"></div>
+            </div>
+
+            <!-- Messages Tab -->
+            <div id="instagramMessages" class="instagram-tab">
+              <div style="background: #fff3cd; border: 1px solid #ffeaa7; border-radius: 8px; padding: 15px; margin-bottom: 20px;">
+                <strong>⚠️ Messaging Features</strong>
+                <p style="margin: 10px 0 0 0; font-size: 14px;">
+                  Instagram Direct Messages require additional permissions.
+                </p>
+              </div>
+              
+              <h3>Direct Messages</h3>
+              <button onclick="loadInstagramConversations()" class="btn-primary">Load Conversations</button>
+              <div style="display: flex; gap: 15px; margin-top: 15px;">
+                <div id="instagramConversations" style="width: 200px; max-height: 300px; overflow-y: auto; border: 1px solid #ddd; border-radius: 8px; padding: 10px;"></div>
+                <div style="flex: 1;">
+                  <div id="instagramMessagesThread" style="max-height: 250px; overflow-y: auto; border: 1px solid #ddd; border-radius: 8px; padding: 10px; margin-bottom: 10px;"></div>
+                  <div style="display: flex; gap: 10px;">
+                    <input id="instagramReplyInput" type="text" placeholder="Messaging requires app review..." style="flex: 1; padding: 10px; border: 1px solid #ccc; border-radius: 6px;" disabled>
+                    <button onclick="sendInstagramMessage()" class="btn-primary" disabled>Send</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Profile Tab -->
+            <div id="instagramProfile" class="instagram-tab">
+              <h3>Profile Info</h3>
+              <button onclick="loadInstagramProfile()" class="btn-primary">Refresh Profile</button>
+              <div id="profileInfo" style="margin-top: 15px;"></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Your existing WhatsApp, Customers, and Settings sections -->
+      <section id="whatsappSection" class="hidden">
+        <div class="card" style="max-width: 500px;">
+          <h2>WhatsApp</h2>
+          <p>Monitor and respond to your WhatsApp business messages.</p>
+          <p style="color: #666; font-style: italic;">WhatsApp integration coming soon...</p>
+        </div>
+      </section>
+
+      <section id="customersSection" class="hidden">
+        <div class="card" style="max-width: 500px;">
+          <h2>Customers</h2>
+          <p>Track your leads and manage customer relationships.</p>
+          <p style="color: #666; font-style: italic;">Customer management coming soon...</p>
+        </div>
+      </section>
+
+      <section id="settingsSection" class="hidden">
+        <div class="card" style="max-width: 500px;">
+          <h2>Settings</h2>
+          <p>Manage integrations, permissions, and account preferences.</p>
+          <p style="color: #666; font-style: italic;">Settings panel coming soon...</p>
+        </div>
+      </section>
+    </div>
+  </div>
+
+
+<script>
+    // Global variables
+    let selectedConversationId = null;
+
+    // Get user data from query string
+    const params = new URLSearchParams(window.location.search);
+    const name = params.get("name");
+    const picture = params.get("picture");
+
+    if (name) {
+      document.getElementById("userName").innerText = name;
+      document.getElementById("topbarName").innerText = name;
+      document.getElementById("profilePic").src = picture;
+      document.getElementById("topbarPic").src = picture;
+    }
+
+    // Navigation switching
+    const navItems = document.querySelectorAll(".nav-item");
+    const sections = document.querySelectorAll("section");
+    const sectionTitle = document.getElementById("sectionTitle");
+
+    navItems.forEach(item => {
+      item.addEventListener("click", () => {
+        // Remove active class from all
+        navItems.forEach(i => i.classList.remove("active"));
+        item.classList.add("active");
+
+        // Hide all sections
+        sections.forEach(sec => sec.classList.add("hidden"));
+
+        // Show selected section
+        const sectionId = item.dataset.section + "Section";
+        document.getElementById(sectionId).classList.remove("hidden");
+
+        // Update title
+        sectionTitle.textContent = item.innerText.trim();
+
+        // Load data when sections are opened
+        if (item.dataset.section === 'messenger') {
+          loadConversations();
+        } else if (item.dataset.section === 'instagram') {
+          checkInstagramConnection();
+        }
+      });
+    });
+
+    // ==================== MESSENGER FUNCTIONS ====================
+
+
+/* Global state */
+let FACEBOOK_LIVE_MODE = false;
+
+/* ---- Tab handling ---- */
+function showFacebookTab(tabName, evt) {
+  const eventObj = evt || window.event || null;
+  document.querySelectorAll('.facebook-tab').forEach(tab => tab.style.display = 'none');
+  document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+
+  const title = tabName.charAt(0).toUpperCase() + tabName.slice(1);
+  const el = document.getElementById(`facebook${title}`);
+  if (el) el.style.display = 'block';
+
+  if (eventObj && eventObj.target) {
+    const targetBtn = eventObj.target.closest ? eventObj.target.closest('.tab-btn') : eventObj.target;
+    if (targetBtn) targetBtn.classList.add('active');
+  }
+
+  if (tabName === 'posts') loadFacebookPosts();
+  else if (tabName === 'comments') loadFacebookComments();
+  else if (tabName === 'messenger') loadConversations();
+}
+
+/* ---- Init (run on load) ---- */
+async function initFacebookSection() {
+  // Attach sendReply handler (safe — DOM exists)
+  const sendBtn = document.getElementById('sendReply');
+  if (sendBtn) {
+    sendBtn.addEventListener('click', async () => {
+      const text = (document.getElementById('replyInput')?.value || '').trim();
+      if (!text) return alert('Please type a reply');
+
+      if (!FACEBOOK_LIVE_MODE) {
+        const msgsEl = document.getElementById('messages');
+        const now = new Date().toISOString();
+        const div = document.createElement('div');
+        div.style = 'margin-bottom:8px;';
+        div.innerHTML = `<small style="color:#777">${new Date(now).toLocaleString()}</small>
+                         <div style="padding:8px;background:#e8f5e9;border-radius:8px;margin-top:4px;">
+                           <strong style="font-size:13px">You (demo)</strong><div>${escapeHtml(text)}</div>
+                         </div>`;
+        msgsEl && msgsEl.appendChild(div);
+        document.getElementById('replyInput').value = '';
+        return;
+      }
+
+      try {
+        const res = await fetch('/api/facebook/reply-message', {
+          method: 'POST',
+          headers: {'Content-Type':'application/json'},
+          body: JSON.stringify({ text })
+        });
+        const data = await res.json();
+        if (data.success) {
+          alert('Reply sent');
+          document.getElementById('replyInput').value = '';
+          loadConversations();
+        } else {
+          alert('Failed to send reply: ' + (data.error || 'unknown'));
+        }
+      } catch (err) {
+        console.error('Error sending reply:', err);
+        alert('Failed to send reply: ' + err.message);
+      }
+    });
+  } else {
+    console.warn('sendReply button not found - ensure element id matches "sendReply"');
+  }
+
+  // get live/demo status from backend
+  try {
+    const res = await fetch('/api/facebook/status');
+    if (res.ok) {
+      const json = await res.json();
+      FACEBOOK_LIVE_MODE = !!json.live;
+    } else {
+      FACEBOOK_LIVE_MODE = false;
+    }
+  } catch (e) {
+    FACEBOOK_LIVE_MODE = false;
+  }
+
+  const badge = document.getElementById('modeBadge');
+  if (badge) {
+    badge.innerText = FACEBOOK_LIVE_MODE ? 'Live Mode' : 'Demo Mode';
+    badge.style.background = FACEBOOK_LIVE_MODE ? '#e6ffed' : '#ffefc2';
+  }
+
+  // Preload conversations for convenience
+  loadConversations();
+}
+
+/* ---- Conversations / messages (with live -> mock fallback) ---- */
+async function loadConversations() {
+  const liveUrl = '/api/facebook/conversations';
+  const mockUrl = '/api/facebook/mock/conversations';
+  const convEl = document.getElementById('conversations');
+  if (!convEl) return console.warn('Conversations container not found');
+  convEl.innerHTML = 'Loading conversations...';
+
+  try {
+    let res = await fetch(liveUrl);
+    if (!res.ok) {
+      console.warn(`Live conversations returned ${res.status}. Falling back to mock.`);
+      res = await fetch(mockUrl);
+      if (!res.ok) throw new Error(`Mock fetch failed: HTTP ${res.status}`);
+    }
+    const convs = await res.json();
+    convEl.innerHTML = '';
+    if (!convs || convs.length === 0) convEl.innerHTML = '<p>No conversations found.</p>';
+    else {
+      convs.forEach(c => {
+        const node = document.createElement('div');
+        node.className = 'conversation-item tab-btn';
+        node.style = 'padding:10px;border-bottom:1px solid #eee;cursor:pointer;';
+        node.innerHTML = `<strong>${escapeHtml(c.sender_name)}</strong><br><small>${escapeHtml(c.snippet || '')}</small>`;
+        node.onclick = (ev) => {
+          document.querySelectorAll('.conversation-item').forEach(x => x.classList.remove('active'));
+          node.classList.add('active');
+          loadMessagesForConversation(c.id);
+        };
+        convEl.appendChild(node);
+      });
+    }
+  } catch (err) {
+    console.error('Failed to load conversations:', err);
+    convEl.innerHTML = `<p>Error loading conversations: ${escapeHtml(err.message)}</p>`;
+  }
+}
+
+async function loadMessagesForConversation(convId) {
+  const liveUrl = `/api/facebook/conversations/${encodeURIComponent(convId)}/messages`;
+  const mockUrl = `/api/facebook/mock/conversations/${encodeURIComponent(convId)}/messages`;
+  const msgsEl = document.getElementById('messages');
+  if (!msgsEl) {
+    console.warn('Messages container not found');
+    return;
+  }
+  msgsEl.innerHTML = 'Loading messages...';
+
+  try {
+    let res = await fetch(liveUrl);
+    if (!res.ok) {
+      console.warn(`Live messages returned ${res.status}. Falling back to mock messages.`);
+      res = await fetch(mockUrl);
+      if (!res.ok) throw new Error(`Mock fetch failed: HTTP ${res.status}`);
+    }
+
+    const messages = await res.json();
+    msgsEl.innerHTML = '';
+    if (!messages || messages.length === 0) {
+      msgsEl.innerHTML = '<p>No messages found for this conversation.</p>';
+      return;
+    }
+
+    messages.forEach(m => {
+      const mDiv = document.createElement('div');
+      mDiv.style = 'margin-bottom:8px;';
+      mDiv.innerHTML = `<small style="color:#777">${new Date(m.created_time).toLocaleString()}</small>
+                        <div style="padding:8px;background:${m.from_me ? '#e8f5e9' : '#f4f4f4'};border-radius:8px;margin-top:4px;">
+                          <strong style="font-size:13px">${escapeHtml(m.from_name || m.from?.name || 'Unknown')}</strong>
+                          <div>${escapeHtml(m.text || m.message || '')}</div>
+                        </div>`;
+      msgsEl.appendChild(mDiv);
+    });
+  } catch (err) {
+    console.error('Failed to load messages:', err);
+    msgsEl.innerHTML = `<p>Error loading messages: ${escapeHtml(err.message)}</p>`;
+  }
+}
+
+/* ---- Posts & Comments ---- */
+async function loadFacebookPosts() {
+  const url = FACEBOOK_LIVE_MODE ? '/api/facebook/posts' : '/api/facebook/mock/posts';
+  const list = document.getElementById('facebookPostsList');
+  if (!list) return console.warn('facebookPostsList not found');
+  list.innerHTML = 'Loading posts...';
+  try {
+    const res = await fetch(url);
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const posts = await res.json();
+    updateFacebookPostsUI(posts);
+  } catch (err) {
+    console.error(err);
+    list.innerHTML = '<p>Error loading posts: ' + escapeHtml(err.message) + '</p>';
+  }
+}
+
+function updateFacebookPostsUI(posts) {
+  const postsList = document.getElementById('facebookPostsList');
+  if (!postsList) return;
+  postsList.innerHTML = '';
+  if (!posts || posts.length === 0) {
+    postsList.innerHTML = '<p>No posts found on your Facebook Page.</p>';
+    return;
+  }
+  posts.forEach(post => {
+    const postDiv = document.createElement('div');
+    postDiv.className = 'ig-post';
+    postDiv.style = 'padding:10px;border-bottom:1px solid #eee;';
+    postDiv.innerHTML = `
+      <strong>${escapeHtml(post.message || 'No message content')}</strong>
+      <br>
+      <small>👍 ${post.likes || 0} likes | 💬 ${post.comments || 0} comments</small>
+      <br>
+      <small>📅 ${new Date(post.created_time).toLocaleString()}</small>
+      <div style="margin-top: 10px;">
+        <button onclick="viewPostComments('${post.id}')" class="btn-primary" style="padding: 5px 10px; font-size: 12px;">View Comments</button>
+      </div>
+    `;
+    postsList.appendChild(postDiv);
+  });
+}
+
+async function loadFacebookComments() {
+  const url = FACEBOOK_LIVE_MODE ? '/api/facebook/comments' : '/api/facebook/mock/comments';
+  const list = document.getElementById('facebookCommentsList');
+  if (!list) return console.warn('facebookCommentsList not found');
+  list.innerHTML = 'Loading comments...';
+  try {
+    const res = await fetch(url);
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const comments = await res.json();
+    updateFacebookCommentsUI(comments);
+  } catch (err) {
+    console.error(err);
+    list.innerHTML = '<p>Error loading comments: ' + escapeHtml(err.message) + '</p>';
+  }
+}
+
+function updateFacebookCommentsUI(comments) {
+  const commentsList = document.getElementById('facebookCommentsList');
+  if (!commentsList) return;
+  commentsList.innerHTML = '';
+  if (!comments || comments.length === 0) {
+    commentsList.innerHTML = '<p>No comments found on your Facebook Page.</p>';
+    return;
+  }
+  comments.forEach(comment => {
+    const commentDiv = document.createElement('div');
+    commentDiv.className = 'ig-post';
+    commentDiv.style = 'padding:10px;border-bottom:1px solid #eee;';
+    commentDiv.innerHTML = `
+      <strong>${escapeHtml(comment.from?.name || 'Unknown User')}</strong>
+      <p>${escapeHtml(comment.message)}</p>
+      <small>📅 ${new Date(comment.created_time).toLocaleString()}</small>
+      <div style="margin-top: 10px;">
+        <button onclick="replyToFacebookComment('${comment.id}')" class="btn-primary" style="padding: 5px 10px; font-size: 12px;">Reply</button>
+      </div>
+    `;
+    commentsList.appendChild(commentDiv);
+  });
+}
+
+/* ---- Create post & reply to comment ---- */
+async function createFacebookPost() {
+  const message = (document.getElementById('postMessage')?.value || '').trim();
+  if (!message) return alert('Please enter a message for your post');
+
+  if (!FACEBOOK_LIVE_MODE) {
+    alert('✅ (Demo) Post created successfully');
+    document.getElementById('postMessage').value = '';
+    showFacebookTab('posts');
+    return;
+  }
+
+  try {
+    const res = await fetch('/api/facebook/create-post', {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ message })
+    });
+    const data = await res.json();
+    if (data.success) {
+      alert('✅ Post published successfully on your Facebook Page!');
+      document.getElementById('postMessage').value = '';
+      showFacebookTab('posts');
+    } else {
+      alert('❌ Failed to publish post: ' + data.error);
+    }
+  } catch (err) {
+    console.error(err);
+    alert('❌ Failed to create post: ' + err.message);
+  }
+}
+
+async function replyToFacebookComment(commentId) {
+  const reply = prompt('Enter your reply:');
+  if (!reply) return;
+  if (!FACEBOOK_LIVE_MODE) {
+    alert('✅ (Demo) Reply posted successfully!');
+    loadFacebookComments();
+    return;
+  }
+
+  try {
+    const res = await fetch('/api/facebook/reply-comment', {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ commentId, message: reply })
+    });
+    const data = await res.json();
+    if (data.success) {
+      alert('✅ Reply posted successfully!');
+      loadFacebookComments();
+    } else {
+      alert('❌ Failed to post reply: ' + data.error);
+    }
+  } catch (err) {
+    console.error(err);
+    alert('❌ Failed to post reply: ' + err.message);
+  }
+}
+
+/* ---- Demo helpers ---- */
+function startDemoOAuth() {
+  const demoHtml = `
+    <!doctype html>
+    <html>
+      <head><meta charset="utf-8"><title>Demo OAuth</title></head>
+      <body style="font-family:Arial;padding:20px;">
+        <h2>Demo: Facebook Permission Prompt</h2>
+        <p>This is a simulated dialog to show reviewers the permissions your app requests:</p>
+        <ul>
+          <li><strong>pages_messaging</strong> — Send/receive messages from Page</li>
+          <li><strong>pages_manage_posts</strong> — Create posts on the Page</li>
+          <li><strong>pages_read_engagement</strong> — Read Page posts and comments</li>
+        </ul>
+        <p>Click <button id="allow">Allow</button> to simulate approval.</p>
+        <script>
+          document.getElementById('allow').onclick = () => {
+            window.opener.postMessage({demo: 'oauth_granted'}, '*');
+            document.body.innerHTML = '<h3>Permissions granted (demo)</h3><p>Close this window and continue the screencast.</p>';
+          };
+        <\/script>
+      </body>
+    </html>
+  `;
+  const blob = new Blob([demoHtml], { type: 'text/html' });
+  const url = URL.createObjectURL(blob);
+  const w = window.open(url, '_blank', 'width=700,height=600');
+  if (!w) {
+    alert('Popup blocked — allow popups for this site to show the demo OAuth window.');
+    URL.revokeObjectURL(url);
+    return;
+  }
+  w.addEventListener('load', () => setTimeout(() => URL.revokeObjectURL(url), 2000));
+}
+
+function simulateGrantPermissions() {
+  alert('Simulating server token exchange and saving tokens (demo). Open server console to show logs in screencast.');
+  // If you want UI to behave as if live tokens exist for recording, toggle "Simulate Live" button.
+}
+
+/* ---- Connect & simulate live helpers ---- */
+function connectFacebookPage() {
+  if (FACEBOOK_LIVE_MODE) {
+    // real auth (opens real business auth endpoint)
+    window.open('/api/auth/business', '_blank');
+    return;
+  }
+  // demo path
+  startDemoOAuth();
+  setTimeout(() => alert('Demo OAuth opened — allow and show server console to record token exchange (demo).'), 300);
+}
+
+function toggleSimulateLive() {
+  FACEBOOK_LIVE_MODE = !FACEBOOK_LIVE_MODE;
+  const btn = document.getElementById('simulateLiveBtn');
+  const badge = document.getElementById('modeBadge');
+  if (FACEBOOK_LIVE_MODE) {
+    btn.innerText = 'Simulate Demo';
+    badge.innerText = 'Live Mode (simulated)';
+    badge.style.background = '#e6ffed';
+    alert('UI now behaves as if live credentials exist (simulated). Use this only for screencast.');
+  } else {
+    btn.innerText = 'Simulate Live';
+    badge.innerText = 'Demo Mode';
+    badge.style.background = '#ffefc2';
+  }
+}
+
+/* ---- Utility helpers ---- */
+function viewPostComments(postId) {
+  showFacebookTab('comments', null);
+  console.log('Requested comments for post', postId);
+}
+
+async function sendMessage(conversationId, text) {
+  if (!text || !text.trim()) return alert('Please enter a message');
+  if (!FACEBOOK_LIVE_MODE) {
+    const msgsEl = document.getElementById('messages');
+    const now = new Date().toISOString();
+    const div = document.createElement('div');
+    div.style = 'margin-bottom:8px;';
+    div.innerHTML = `<small style="color:#777">${new Date(now).toLocaleString()}</small>
+                     <div style="padding:8px;background:#e8f5e9;border-radius:8px;margin-top:4px;">
+                       <strong style="font-size:13px">You (demo)</strong><div>${escapeHtml(text)}</div>
+                     </div>`;
+    msgsEl && msgsEl.appendChild(div);
+    return;
+  }
+  try {
+    const res = await fetch('/api/facebook/reply-message', {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ conversationId, text })
+    });
+    const data = await res.json();
+    if (data.success) {
+      alert('Message sent (live)');
+      loadMessagesForConversation(conversationId);
+    } else {
+      alert('Failed to send message: ' + (data.error || 'unknown'));
+    }
+  } catch (err) {
+    console.error('sendMessage error', err);
+    alert('Failed to send message: ' + err.message);
+  }
+}
+
+function clearPostForm() {
+  const el = document.getElementById('postMessage');
+  if (el) el.value = '';
+}
+
+function escapeHtml(text) {
+  if (text === undefined || text === null) return '';
+  return String(text).replace(/[&<>"']/g, (m) => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+}
+
+/* ---- Init ---- */
+window.addEventListener('load', initFacebookSection);
+window.addEventListener('message', (ev) => {
+  if (ev.data?.demo === 'oauth_granted') {
+    alert('Demo: permissions granted (this app will now have access to user data).');
+  }
+});
+
+
+
+
+
+
+
+
+
+
+// ==================== INSTAGRAM FUNCTIONS ====================
+// ==================== INSTAGRAM FUNCTIONS ====================
+// ==================== INSTAGRAM FUNCTIONS ====================
+// ==================== INSTAGRAM FUNCTIONS ====================
+// Instagram Variables
+    let instagramConnected = false;
+    let selectedInstagramConversation = null;
+
+    async function connectInstagram() {
+      const currentUrl = encodeURIComponent(window.location.href.split('?')[0]); // Clean URL
+      window.location.href = `/api/auth/instagram/start?return_url=${currentUrl}`;
+    }
+
+   async function checkInstagramConnection() {
+    try {
+        console.log('🔍 [checkInstagramConnection] Checking connection...');
+        const res = await fetch('/api/instagram/status');
+        
+        if (!res.ok) {
+            console.error('❌ [checkInstagramConnection] HTTP error:', res.status);
+            throw new Error(`HTTP error! status: ${res.status}`);
+        }
+        
+        const status = await res.json();
+        console.log('🔍 [checkInstagramConnection] API Response:', status);
+        
+        if (status.connected && status.profile) {
+            console.log('✅ [checkInstagramConnection] Showing connected UI');
+            showInstagramConnected(status.profile);
+        } else {
+            console.log('❌ [checkInstagramConnection] Showing disconnected UI');
+            showInstagramDisconnected();
+        }
+    } catch (error) {
+        console.error('❌ [checkInstagramConnection] Failed:', error);
+        showInstagramDisconnected();
+    }
+}
+
+function checkInstagramAuthResult() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const instagramAuth = urlParams.get('instagram_auth');
+    
+    console.log('🔍 [checkInstagramAuthResult] Checking URL params:', {
+        instagramAuth: instagramAuth,
+        allParams: Object.fromEntries(urlParams.entries())
+    });
+    
+    if (instagramAuth === 'success') {
+        const igUsername = urlParams.get('ig_username');
+        console.log('🎉 [checkInstagramAuthResult] OAuth success for:', igUsername);
+        
+        // Force immediate connection check
+        checkInstagramConnection();
+        cleanInstagramURL();
+        
+    } else if (instagramAuth === 'error') {
+        const error = urlParams.get('error');
+        console.error('💥 [checkInstagramAuthResult] OAuth error:', error);
+        alert(`Instagram connection failed: ${error}`);
+        cleanInstagramURL();
+    } else {
+        console.log('🔍 [checkInstagramAuthResult] No OAuth parameters found');
+    }
+}
+    function showInstagramConnected(profile) {
+      document.getElementById('instagramAuthPrompt').style.display = 'none';
+      document.getElementById('instagramContent').style.display = 'block';
+      instagramConnected = true;
+      
+      // Update UI with profile info
+      const profileElement = document.querySelector('#instagramContent h2');
+      if (profileElement) {
+        profileElement.innerHTML = `Instagram Manager - @${profile.username}`;
+      }
+      
+      console.log('✅ Instagram connected:', profile.username);
+    }
+
+    function showInstagramDisconnected() {
+      document.getElementById('instagramAuthPrompt').style.display = 'block';
+      document.getElementById('instagramContent').style.display = 'none';
+      instagramConnected = false;
+      console.log('❌ Instagram not connected');
+    }
+
+// Add post creation functionality
+async function createInstagramPost() {
+  const caption = document.getElementById('postCaption').value.trim();
+  const imageUrl = document.getElementById('postImageUrl').value.trim();
+  
+  if (!caption) {
+    alert('Please enter a caption for your post');
+    return;
+  }
+
+  try {
+    const res = await fetch('/api/instagram/create-post', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ 
+        caption: caption,
+        image_url: imageUrl // For now, use URL. Later can handle file uploads
+      })
+    });
+
+    const data = await res.json();
+    if (data.success) {
+      alert('✅ Post created successfully!');
+      document.getElementById('postCaption').value = '';
+      document.getElementById('postImageUrl').value = '';
+      loadInstagramPosts(); // Reload to see the new post
+    } else {
+      alert('❌ Failed to create post: ' + data.error);
+    }
+  } catch (error) {
+    console.error('Failed to create post:', error);
+    alert('❌ Failed to create post: ' + error.message);
+  }
+}
+
+
+    // Check for Instagram auth success in URL parameters on page load
+  function checkInstagramAuthResult() {
+  const urlParams = new URLSearchParams(window.location.search);
+  const instagramAuth = urlParams.get('instagram_auth'); // FIXED: changed from 'instagram_connect'
+  
+  console.log('🔍 Checking Instagram auth result:', instagramAuth);
+  
+  if (instagramAuth === 'success') {
+    const igUsername = urlParams.get('ig_username');
+    console.log('✅ Instagram auth success for:', igUsername);
+    
+    // Force check the connection status
+    checkInstagramConnection();
+    
+    // Clean the URL to remove Instagram parameters
+    cleanInstagramURL();
+    
+  } else if (instagramAuth === 'error') {
+    const error = urlParams.get('error');
+    console.error('❌ Instagram auth error:', error);
+    alert(`Instagram connection failed: ${error}`);
+    cleanInstagramURL();
+  }
+}
+    // Clean Instagram parameters from URL
+ function cleanInstagramURL() {
+  const url = new URL(window.location);
+  const params = new URLSearchParams(url.search);
+  
+  // Remove Instagram-related parameters (FIXED: use correct parameter names)
+  ['instagram_auth', 'ig_username', 'ig_name', 'ig_picture', 'error'].forEach(param => {
+    params.delete(param);
+  });
+  
+  // Update URL without reloading the page
+  const newUrl = params.toString() ? `${url.pathname}?${params.toString()}` : url.pathname;
+  window.history.replaceState({}, document.title, newUrl);
+}
+
+
+  // Enhanced profile display
+async function loadInstagramProfile() {
+  if (!instagramConnected) return;
+
+  try {
+    const res = await fetch('/api/instagram/profile');
+    const profile = await res.json();
+    
+    const profileInfo = document.getElementById('profileInfo');
+    profileInfo.innerHTML = `
+      <div style="display: flex; gap: 20px; align-items: center; margin-bottom: 20px;">
+        <img src="${profile.profile_picture_url}" style="width: 80px; height: 80px; border-radius: 50%;">
+        <div>
+          <h3>${profile.name || 'N/A'}</h3>
+          <p>@${profile.username || 'N/A'}</p>
+        </div>
+      </div>
+      <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; text-align: center;">
+        <div class="stat-card">
+          <div class="stat-number">${profile.followers_count || 0}</div>
+          <div class="stat-label">Followers</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-number">${profile.follows_count || 0}</div>
+          <div class="stat-label">Following</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-number">${profile.media_count || 0}</div>
+          <div class="stat-label">Posts</div>
+        </div>
+      </div>
+      ${profile.biography ? `<div style="margin-top: 20px; padding: 15px; background: #f5f5f5; border-radius: 8px;">
+        <strong>Bio:</strong> ${profile.biography}
+      </div>` : ''}
+    `;
+  } catch (error) {
+    console.error('Failed to load profile:', error);
+  }
+}
+
+// Enhanced posts with media display
+async function loadInstagramPosts() {
+  if (!instagramConnected) return;
+
+  try {
+    const res = await fetch('/api/instagram/posts');
+    const posts = await res.json();
+    
+    const postsList = document.getElementById('postsList');
+    postsList.innerHTML = '';
+    
+    if (!posts || posts.length === 0) {
+      postsList.innerHTML = '<p>No posts found.</p>';
+      return;
+    }
+    
+    posts.forEach(post => {
+      const postDiv = document.createElement('div');
+      postDiv.className = 'ig-post';
+      postDiv.style.marginBottom = '20px';
+      postDiv.style.padding = '15px';
+      postDiv.style.border = '1px solid #ddd';
+      postDiv.style.borderRadius = '8px';
+      
+      let mediaHtml = '';
+      if (post.media_url) {
+        if (post.media_type === 'VIDEO') {
+          mediaHtml = `<video src="${post.media_url}" controls style="max-width: 100%; border-radius: 8px; margin-bottom: 10px;"></video>`;
+        } else {
+          mediaHtml = `<img src="${post.media_url}" style="max-width: 100%; border-radius: 8px; margin-bottom: 10px;">`;
+        }
+      }
+      
+      postDiv.innerHTML = `
+        ${mediaHtml}
+        <div><strong>${post.caption || 'No caption'}</strong></div>
+        <div style="display: flex; gap: 15px; margin-top: 10px; font-size: 14px; color: #666;">
+          <span>❤️ ${post.like_count || 0} likes</span>
+          <span>💬 ${post.comments_count || 0} comments</span>
+          <span>📅 ${new Date(post.timestamp).toLocaleDateString()}</span>
+        </div>
+        ${post.permalink ? `<a href="${post.permalink}" target="_blank" style="display: inline-block; margin-top: 10px; color: #0095f6;">View on Instagram</a>` : ''}
+      `;
+      postsList.appendChild(postDiv);
+    });
+  } catch (error) {
+    console.error('Failed to load posts:', error);
+  }
+}
+
+async function loadInstagramConversations() {
+  if (!instagramConnected) {
+    alert('Please connect Instagram first');
+    return;
+  }
+
+  try {
+    const res = await fetch('/api/instagram/conversations');
+    
+    if (!res.ok) {
+      const errorData = await res.json();
+      throw new Error(errorData.error || `HTTP error! status: ${res.status}`);
+    }
+    
+    const response = await res.json();
+    
+    const conversationsDiv = document.getElementById('instagramConversations');
+    conversationsDiv.innerHTML = '';
+    
+    // Check if messaging is not available
+    if (response.error === 'messaging_not_available') {
+      conversationsDiv.innerHTML = `
+        <div style="text-align: center; padding: 20px; color: #666;">
+          <div style="font-size: 48px; margin-bottom: 10px;">💬</div>
+          <h4>Messaging Not Available</h4>
+          <p>Instagram Direct Messages are not accessible for this account.</p>
+          <div style="background: #f5f5f5; padding: 15px; border-radius: 8px; margin-top: 15px; text-align: left;">
+            <strong>To enable messaging:</strong>
+            <ul style="margin: 10px 0; padding-left: 20px;">
+              <li>Ensure Instagram Business/Creator account</li>
+              <li>Connect to a Facebook Page</li>
+              <li>Request instagram_manage_messages permission</li>
+            </ul>
+          </div>
+        </div>
+      `;
+      return;
+    }
+    
+    // Handle actual conversations data
+    const conversations = Array.isArray(response) ? response : (response.data || []);
+    
+    if (!conversations || conversations.length === 0) {
+      conversationsDiv.innerHTML = `
+        <div style="text-align: center; padding: 20px; color: #666;">
+          <div style="font-size: 48px; margin-bottom: 10px;">📭</div>
+          <p>No conversations found</p>
+        </div>
+      `;
+      return;
+    }
+    
+    conversations.forEach(conv => {
+      const convDiv = document.createElement('div');
+      convDiv.className = 'conversation-item';
+      
+      let username = 'Unknown';
+      if (conv.participants && conv.participants.data && conv.participants.data[0]) {
+        username = conv.participants.data[0].username || 'Unknown';
+      } else if (conv.senders && conv.senders.data && conv.senders.data[0]) {
+        username = conv.senders.data[0].username || 'Unknown';
+      }
+      
+      convDiv.innerHTML = `<strong>${username}</strong>`;
+      convDiv.onclick = () => loadInstagramMessages(conv.id, username);
+      conversationsDiv.appendChild(convDiv);
+    });
+  } catch (error) {
+    console.error('Failed to load conversations:', error);
+    
+    const conversationsDiv = document.getElementById('instagramConversations');
+    conversationsDiv.innerHTML = `
+      <div style="text-align: center; padding: 20px; color: #d32f2f;">
+        <div style="font-size: 48px; margin-bottom: 10px;">⚠️</div>
+        <p>Unable to load conversations</p>
+        <small>${error.message}</small>
+      </div>
+    `;
+  }
+}
+
+
+async function loadInstagramMessages(conversationId, username) {
+  if (!instagramConnected) return;
+  
+  selectedInstagramConversation = { id: conversationId, username };
+  
+  try {
+    const res = await fetch(`/api/instagram/messages?conversationId=${conversationId}`);
+    
+    if (!res.ok) {
+      const errorData = await res.json();
+      throw new Error(errorData.error || `HTTP error! status: ${res.status}`);
+    }
+    
+    const messages = await res.json();
+    
+    const messagesThread = document.getElementById('instagramMessagesThread');
+    messagesThread.innerHTML = '';
+    
+    if (!messages || !Array.isArray(messages)) {
+      console.error('Messages response is not an array:', messages);
+      messagesThread.innerHTML = '<p>Error: Unexpected response format</p>';
+      return;
+    }
+    
+    if (messages.length === 0) {
+      messagesThread.innerHTML = '<p>No messages in this conversation.</p>';
+      return;
+    }
+    
+    messages.forEach(msg => {
+      const msgDiv = document.createElement('div');
+      msgDiv.className = `ig-message ${msg.from && msg.from.username ? 'incoming' : 'outgoing'}`;
+      
+      let messageText = msg.text || 'No message content';
+      let sender = msg.from && msg.from.username ? `@${msg.from.username}` : 'You';
+      
+      msgDiv.innerHTML = `<strong>${sender}:</strong> ${messageText}`;
+      messagesThread.appendChild(msgDiv);
+    });
+    
+    messagesThread.scrollTop = messagesThread.scrollHeight;
+  } catch (error) {
+    console.error('Failed to load messages:', error);
+    alert('Failed to load messages: ' + error.message);
+  }
+}
+
+    async function loadInstagramProfile() {
+      if (!instagramConnected) {
+        alert('Please connect Instagram first');
+        return;
+      }
+
+      try {
+        const res = await fetch('/api/instagram/profile');
+        const profile = await res.json();
+        
+        const profileInfo = document.getElementById('profileInfo');
+        profileInfo.innerHTML = `
+          <div class="ig-post">
+            <strong>${profile.name || 'N/A'}</strong>
+            <br>Username: @${profile.username || 'N/A'}
+            <br>Followers: ${profile.followers_count || 0}
+            <br>Following: ${profile.follows_count || 0}
+            <br>Posts: ${profile.media_count || 0}
+            <br>Bio: ${profile.biography || 'No bio'}
+          </div>
+        `;
+      } catch (error) {
+        console.error('Failed to load profile:', error);
+        alert('Failed to load profile: ' + error.message);
+      }
+    }
+
+
+    // Story creation functions
+async function createInstagramStory() {
+  const imageUrl = document.getElementById('storyImageUrl').value.trim();
+  const videoUrl = document.getElementById('storyVideoUrl').value.trim();
+  const caption = document.getElementById('storyCaption').value.trim();
+  const mentionedUsername = document.getElementById('storyMention').value.trim();
+  
+  if (!imageUrl && !videoUrl) {
+    alert('Please provide either an image URL or video URL for your story');
+    return;
+  }
+
+  // Show loading state
+  const createBtn = event.target;
+  const originalText = createBtn.textContent;
+  createBtn.textContent = 'Creating Story...';
+  createBtn.disabled = true;
+
+  try {
+    const endpoint = mentionedUsername ? '/api/instagram/create-story-mention' : '/api/instagram/create-story';
+    
+    const res = await fetch(endpoint, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ 
+        image_url: imageUrl,
+        video_url: videoUrl,
+        caption: caption,
+        mentioned_username: mentionedUsername
+      })
+    });
+
+    if (!res.ok) {
+      const errorText = await res.text();
+      throw new Error(`HTTP error! status: ${res.status}. ${errorText}`);
+    }
+
+    const data = await res.json();
+    
+    if (data.success) {
+      alert('✅ ' + (data.message || 'Story created successfully!'));
+      
+      // Clear form
+      document.getElementById('storyImageUrl').value = '';
+      document.getElementById('storyVideoUrl').value = '';
+      document.getElementById('storyCaption').value = '';
+      document.getElementById('storyMention').value = '';
+      
+      // Reload stories after a delay
+      setTimeout(() => {
+        loadInstagramStories();
+      }, 2000);
+    } else {
+      throw new Error(data.error || 'Unknown error occurred');
+    }
+  } catch (error) {
+    console.error('Failed to create story:', error);
+    
+    let errorMessage = 'Failed to create story: ' + error.message;
+    if (error.message.includes('URL')) {
+      errorMessage = 'Please check your image/video URL and try again.';
+    } else if (error.message.includes('access') || error.message.includes('permission')) {
+      errorMessage = 'Story creation is not available. Please check your Instagram account permissions.';
+    }
+    
+    alert('❌ ' + errorMessage);
+  } finally {
+    // Reset button state
+    createBtn.textContent = originalText;
+    createBtn.disabled = false;
+  }
+}
+
+async function loadInstagramStories() {
+  if (!instagramConnected) return;
+  
+  try {
+    const res = await fetch('/api/instagram/stories');
+    const stories = await res.json();
+    
+    const storiesList = document.getElementById('storiesList');
+    storiesList.innerHTML = '';
+    
+    if (!stories || stories.length === 0) {
+      storiesList.innerHTML = `
+        <div style="text-align: center; padding: 20px; color: #666;">
+          <p>No active stories found</p>
+          <small>Stories disappear after 24 hours</small>
+        </div>
+      `;
+      return;
+    }
+    
+    stories.forEach(story => {
+      const storyDiv = document.createElement('div');
+      storyDiv.className = 'ig-post';
+      storyDiv.style.marginBottom = '20px';
+      storyDiv.style.padding = '15px';
+      storyDiv.style.border = '1px solid #ddd';
+      storyDiv.style.borderRadius = '8px';
+      
+      let mediaHtml = '';
+      if (story.media_url) {
+        if (story.media_type === 'VIDEO') {
+          mediaHtml = `
+            <video src="${story.media_url}" controls style="max-width: 100%; border-radius: 8px; margin-bottom: 10px;">
+              Your browser does not support the video tag.
+            </video>
+          `;
+        } else {
+          mediaHtml = `<img src="${story.media_url}" style="max-width: 100%; border-radius: 8px; margin-bottom: 10px;">`;
+        }
+      } else if (story.thumbnail_url) {
+        mediaHtml = `<img src="${story.thumbnail_url}" style="max-width: 100%; border-radius: 8px; margin-bottom: 10px;">`;
+      }
+      
+      storyDiv.innerHTML = `
+        ${mediaHtml}
+        <div style="display: flex; gap: 15px; margin-top: 10px; font-size: 14px; color: #666;">
+          <span>📅 ${new Date(story.timestamp).toLocaleString()}</span>
+          <span>${story.media_type || 'IMAGE'}</span>
+        </div>
+        ${story.permalink ? `<a href="${story.permalink}" target="_blank" style="display: inline-block; margin-top: 10px; color: #0095f6;">View on Instagram</a>` : ''}
+      `;
+      storiesList.appendChild(storyDiv);
+    });
+  } catch (error) {
+    console.error('Failed to load stories:', error);
+    
+    const storiesList = document.getElementById('storiesList');
+    storiesList.innerHTML = `
+      <div style="text-align: center; padding: 20px; color: #d32f2f;">
+        <p>Unable to load stories</p>
+        <small>${error.message}</small>
+      </div>
+    `;
+  }
+}
+
+
+// Comments and Insights functions
+async function loadInstagramComments() {
+  if (!instagramConnected) return;
+  
+  try {
+    const res = await fetch('/api/instagram/comments');
+    const comments = await res.json();
+    
+    const commentsList = document.getElementById('commentsList');
+    commentsList.innerHTML = '';
+    
+    if (!comments || comments.length === 0) {
+      commentsList.innerHTML = `
+        <div style="text-align: center; padding: 20px; color: #666;">
+          <p>No comments found</p>
+          <small>Comments will appear here when users comment on your posts</small>
+        </div>
+      `;
+      return;
+    }
+    
+    comments.forEach(comment => {
+      const commentDiv = document.createElement('div');
+      commentDiv.className = 'ig-post';
+      commentDiv.style.marginBottom = '15px';
+      commentDiv.style.padding = '15px';
+      commentDiv.style.border = '1px solid #ddd';
+      commentDiv.style.borderRadius = '8px';
+      
+      commentDiv.innerHTML = `
+        <div style="display: flex; justify-content: between; align-items: start; margin-bottom: 10px;">
+          <strong style="color: #0095f6;">@${comment.username || 'user'}</strong>
+          <small style="color: #666; margin-left: auto;">${new Date(comment.timestamp).toLocaleString()}</small>
+        </div>
+        <p style="margin: 0;">${comment.text || 'No comment text'}</p>
+        ${comment.post_caption ? `
+          <div style="margin-top: 10px; padding: 10px; background: #f8f9fa; border-radius: 6px;">
+            <small><strong>On post:</strong> ${comment.post_caption.substring(0, 100)}${comment.post_caption.length > 100 ? '...' : ''}</small>
+          </div>
+        ` : ''}
+      `;
+      commentsList.appendChild(commentDiv);
+    });
+  } catch (error) {
+    console.error('Failed to load comments:', error);
+    
+    const commentsList = document.getElementById('commentsList');
+    commentsList.innerHTML = `
+      <div style="text-align: center; padding: 20px; color: #d32f2f;">
+        <p>Unable to load comments</p>
+        <small>${error.message}</small>
+      </div>
+    `;
+  }
+}
+
+async function loadInstagramInsights() {
+  if (!instagramConnected) return;
+  
+  try {
+    const res = await fetch('/api/instagram/insights');
+    const insights = await res.json();
+    
+    const insightsList = document.getElementById('insightsList');
+    insightsList.innerHTML = '';
+    
+    if (!insights || insights.length === 0) {
+      insightsList.innerHTML = `
+        <div style="text-align: center; padding: 20px; color: #666;">
+          <p>No insights available</p>
+          <small>Insights data may take time to populate</small>
+        </div>
+      `;
+      return;
+    }
+    
+    insights.forEach(insight => {
+      const insightDiv = document.createElement('div');
+      insightDiv.className = 'ig-post';
+      insightDiv.style.marginBottom = '15px';
+      insightDiv.style.padding = '15px';
+      insightDiv.style.border = '1px solid #ddd';
+      insightDiv.style.borderRadius = '8px';
+      
+      let valuesHtml = '';
+      if (insight.values && insight.values.length > 0) {
+        valuesHtml = insight.values.map(value => 
+          `<div style="margin: 5px 0;">
+            <strong>${new Date(value.end_time).toLocaleDateString()}:</strong> ${value.value || 0}
+          </div>`
+        ).join('');
+      }
+      
+      insightDiv.innerHTML = `
+        <div style="display: flex; justify-content: between; align-items: center; margin-bottom: 10px;">
+          <h4 style="margin: 0; color: #0095f6;">${insight.name || 'Metric'}</h4>
+          <span style="background: #e3f2fd; color: #1976d2; padding: 4px 8px; border-radius: 12px; font-size: 12px;">
+            ${insight.period || 'Period'}
+          </span>
+        </div>
+        <div style="color: #666; font-size: 14px;">
+          <strong>Title:</strong> ${insight.title || 'N/A'}<br>
+          <strong>Description:</strong> ${insight.description || 'N/A'}<br>
+          ${valuesHtml ? `<div style="margin-top: 10px;"><strong>Values:</strong>${valuesHtml}</div>` : ''}
+        </div>
+      `;
+      insightsList.appendChild(insightDiv);
+    });
+  } catch (error) {
+    console.error('Failed to load insights:', error);
+    
+    const insightsList = document.getElementById('insightsList');
+    insightsList.innerHTML = `
+      <div style="text-align: center; padding: 20px; color: #d32f2f;">
+        <p>Unable to load insights</p>
+        <small>${error.message}</small>
+      </div>
+    `;
+  }
+}
+
+// Update the tab switching function to include new tabs
+function showInstagramTab(tabName) {
+  console.log('🔄 Switching to tab:', tabName);
+  
+  // Hide all tabs
+  document.querySelectorAll('.instagram-tab').forEach(tab => {
+    tab.classList.remove('active');
+    tab.style.display = 'none';
+  });
+  
+  // Remove active class from all buttons
+  document.querySelectorAll('.tab-btn').forEach(btn => {
+    btn.classList.remove('active');
+  });
+  
+  // Convert tabName to proper ID format
+  const tabId = `instagram${tabName.charAt(0).toUpperCase() + tabName.slice(1)}`;
+  console.log('🔍 Looking for tab ID:', tabId);
+  
+  // Show selected tab and activate button
+  const tabElement = document.getElementById(tabId);
+  if (tabElement) {
+    tabElement.classList.add('active');
+    tabElement.style.display = 'block';
+    console.log('✅ Tab found and displayed:', tabId);
+  } else {
+    console.error('❌ Tab element not found:', tabId);
+    // Fallback: show the first available tab
+    const firstTab = document.querySelector('.instagram-tab');
+    if (firstTab) {
+      firstTab.classList.add('active');
+      firstTab.style.display = 'block';
+    }
+  }
+  
+  // Add active class to clicked button
+  if (event && event.target) {
+    event.target.classList.add('active');
+  }
+  
+  // Auto-load content for certain tabs
+  console.log('📦 Loading content for tab:', tabName);
+  switch(tabName) {
+    case 'posts':
+      loadInstagramPosts();
+      break;
+    case 'stories':
+      loadInstagramStories();
+      break;
+    case 'comments':
+      loadInstagramComments();
+      break;
+    case 'insights':
+      loadInstagramInsights();
+      break;
+    case 'profile':
+      loadInstagramProfile();
+      break;
+    case 'create-story':
+      // Clear form when opening create story tab
+      document.getElementById('storyImageUrl').value = '';
+      document.getElementById('storyVideoUrl').value = '';
+      document.getElementById('storyCaption').value = '';
+      document.getElementById('storyMention').value = '';
+      console.log('✨ Create Story tab opened - form cleared');
+      break;
+    case 'create':
+      // Clear create post form
+      document.getElementById('postCaption').value = '';
+      document.getElementById('postImageUrl').value = '';
+      console.log('✨ Create Post tab opened - form cleared');
+      break;
+    default:
+      console.log('📱 No auto-load for tab:', tabName);
+  }
+} // ==================== EVENT LISTENERS ====================
+
+    document.addEventListener('DOMContentLoaded', function() {
+      // Messenger event listeners
+      document.getElementById('sendReply').onclick = sendMessage;
+      document.getElementById('replyInput').addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') sendMessage();
+      });
+
+      // Check Instagram connection on page load AND auth results
+      checkInstagramConnection();
+      checkInstagramAuthResult(); // Add this line
+    });
+
+    // Update navigation to check Instagram connection when section is opened
+    navItems.forEach(item => {
+      item.addEventListener("click", () => {
+        // Remove active class from all
+        navItems.forEach(i => i.classList.remove("active"));
+        item.classList.add("active");
+
+        // Hide all sections
+        sections.forEach(sec => sec.classList.add("hidden"));
+
+        // Show selected section
+        const sectionId = item.dataset.section + "Section";
+        document.getElementById(sectionId).classList.remove("hidden");
+
+        // Update title
+        sectionTitle.textContent = item.innerText.trim();
+
+        // Load data when sections are opened
+        if (item.dataset.section === 'facebook') {
+          loadConversations();
+        } else if (item.dataset.section === 'instagram') {
+          // Always check Instagram connection status when opening the section
+          console.log('📱 Instagram section opened, checking connection...');
+          checkInstagramConnection();
+          checkInstagramAuthResult(); // Also check for recent auth
+              addDebugButton();
+
+        }
+      });
+    });
+
+
+
+
+
+
+
+
+    // ==================== DEBUG FUNCTIONS ====================
+async function debugInstagramConnection() {
+    console.log('=== DEBUG INSTAGRAM CONNECTION ===');
+    
+    // Check URL parameters
+    const urlParams = new URLSearchParams(window.location.search);
+    console.log('URL Parameters:', Object.fromEntries(urlParams.entries()));
+    
+    // Check connection status via API
+    try {
+        const res = await fetch('/api/instagram/status');
+        const status = await res.json();
+        console.log('API Status Response:', status);
+        
+        if (status.connected) {
+            console.log('✅ Backend says: CONNECTED to', status.profile.username);
+            showInstagramConnected(status.profile);
+        } else {
+            console.log('❌ Backend says: NOT CONNECTED');
+            showInstagramDisconnected();
+        }
+    } catch (error) {
+        console.error('❌ API Call Failed:', error);
+        showInstagramDisconnected();
+    }
+}
+
+// Add a debug button to your HTML temporarily
+</script>
+</body>
+</html>
